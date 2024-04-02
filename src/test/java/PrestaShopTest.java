@@ -26,11 +26,13 @@ public class PrestaShopTest {
     public void prestashopScenarioTest() {
         setUpWebDriver();
         try {
-            driver.get("http://demo.prestashop.com");
+            driver.get("http://demo.prestashop.com"); // это лучше вынести в так называемый TestBase и спрятать от того кто будет тест писать
+
+            // у тебя эта часть повторяется во многих местах, можно сделать одну функцию, например switchToFrame() и вызывать ее
             wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("framelive"));
 
-            clickWhenVisible(By.cssSelector("div[class=\"user-info\"] i"));
-            clickWhenVisible(By.cssSelector("div[class=\"no-account\"] a"));
+            clickWhenVisible(By.cssSelector("div[class=\"user-info\"] i")); // можно просто .user-info i
+            clickWhenVisible(By.cssSelector("div[class=\"no-account\"] a")); // можно просто .no-account a
 
             fillFormAndSubmit();
 
@@ -77,6 +79,8 @@ public class PrestaShopTest {
 
             driver.switchTo().defaultContent();  // Switch back to the main document
             wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("framelive"));  // Switch to the iframe
+
+            // во многих местах код закоменчен без пояснения, если какая-то строчка не используется желательно ее удалить сразу
 //            Thread.sleep(2000);
 //            driver.findElement(By.cssSelector("div.js-product [data-id-product=\"10\"] ")).click();
             clickWhenVisible(By.cssSelector("div.js-product [data-id-product=\"10\"]"));
@@ -270,6 +274,8 @@ public class PrestaShopTest {
         WebElement sliderHandle = driver.findElement(By.cssSelector("a.ui-slider-handle:nth-of-type(2)"));
 
 
+        // слипы плохая практика так как непонятно почему именно такое значение выбрано и что мы именно ждем
+        // лучше привязываться к конкретным элементам и дожидаться пока они появятся или пропадут
         try {
             Thread.sleep(2000); // Wait for any dynamic elements to stabilize
         } catch (InterruptedException e) {
@@ -291,7 +297,7 @@ public class PrestaShopTest {
         // Calculate and return the offset needed for the second slider adjustment
         // This is a placeholder for the actual calculation logic based on your application's specifics
         int maxValue = 42;
-        int minValue = 14;
+        int minValue = 14; // не используется переменная
         int totalSteps = 28; // The total number of steps you can move the handle
         double stepWidth = (double) driver.findElement(By.cssSelector(".ui-slider")).getSize().width / totalSteps;
         int stepsToMove = maxValue - targetValue; // Steps needed to move from max to target
@@ -304,6 +310,7 @@ public class PrestaShopTest {
         // Wait for the black color filter to be visible
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         try {
+            // переменная не используется
             WebElement blackColorFilter = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//li[contains(text(),'Black')]")));
             System.out.println("The black color filter is visible.");
         } catch (TimeoutException e) {
@@ -312,6 +319,7 @@ public class PrestaShopTest {
 
         // Wait for the price filter to be visible
         try {
+            // переменная не используется, можно просто вызывать вейтер и не сохранять его значение
             WebElement priceFilter = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//p[contains(text(),'Price')]")));
             System.out.println("The price filter (€18.00 - €23.00) is visible.");
         } catch (TimeoutException e) {
@@ -322,6 +330,7 @@ public class PrestaShopTest {
 
 
     private void clickColorFilterUsingJS() {
+        // если цвет поменяется, все повалится сразу и будет непонятно в чем именно проблема
         WebElement colorFilterSpan = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span.color[style='background-color:#434A54']")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", colorFilterSpan);
         System.out.println("Clicked color filter successfully.");
